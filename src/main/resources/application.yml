@@ -1,0 +1,58 @@
+customParam:
+  application:
+    host: localhost
+    prot: 7002
+    name: service-config-center
+    path: /service-config-center
+  eureka:
+    name: eureka-config-center
+    colony:
+      http://eureka-service-1:7101/eureka/,
+      http://eureka-service-2:7102/eureka/,
+      http://eureka-service-3:7103/eureka/
+
+server:
+  port: ${customParam.application.prot}
+spring:
+  application:
+    name: ${customParam.eureka.name}
+  profiles:
+    # 配置从哪里读取 本地
+    # active: native
+  cloud:
+    config:
+      # 服务器
+      server:
+        # Git 获取配置: http://localhost:7002/main/application-dev.yml
+        git:
+          default-label: main
+          uri: https://github.com/LuoXianSheng-007/spring-config-center.git
+          search-paths:
+            - application
+
+        # Locations
+        native:
+          searchLocations: D:/WorkSpace/Temp/application
+
+  # get请求(通知客户端去从服务端拉取最新的配置信息) http://localhost:7002/actuator/busrefresh
+#  rabbitmq:
+#    host: 127.0.0.1
+#    port: 5672
+#    username: guest
+#    password: guest
+
+#eureka:
+#  client:
+#    service-url:
+#      defaultZone: ${customParam.eureka.colony}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: 'bus-refresh'
+
+logging:
+  level:
+    com.netflix.discovery: 'OFF'
+    org.springframework.cloud: 'DEBUG'
